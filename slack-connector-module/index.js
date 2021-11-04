@@ -70,7 +70,7 @@ const getSlackJsonResponse = async response => {
 };
 
 /**
- * slack-connector
+ * Manage thread posting to slack
  */
 class main {
   /**
