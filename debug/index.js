@@ -46,7 +46,7 @@ module.exports = async function () {
 
     await toplevel.ReactionAdd("x");
   } catch (e) {
-    console.error(e.stack);
     A.Error(e, { customdata: "goes here" });
+    throw e;
   }
 };
