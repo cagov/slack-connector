@@ -5,8 +5,8 @@
     "type": "git",
     "url": "https://github.com/cagov/slack-connector.git"
   },
-  "description": "",
-  "readme": "slack-connector-module/README.md",
+  "bugs": "https://github.com/cagov/slack-connector/issues",
+  "description": "Development project for slack-connector",
   "type": "commonjs",
   "scripts": {
     "install_normal": "npm install file:slack-connector-module",
@@ -15,7 +15,11 @@
   "keywords": [
     "Slack"
   ],
-  "author": "",
+  "author": {
+    "name": "Carter Medlin",
+    "email": "carter@digital.ca.gov",
+    "url": "https://github.com/carterm"
+  },
   "license": "MIT",
   "devDependencies": {
     "eslint": "^7.32.0",
