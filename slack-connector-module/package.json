@@ -1,0 +1,32 @@
+{
+  "name": "@cagov/slack-connector",
+  "version": "0.0.1",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "main": "index.js",
+  "typings": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cagov/slack-connector.git"
+  },
+  "bugs": "https://github.com/cagov/slack-connector/issues",
+  "description": "Easy access to the Slack API.",
+  "scripts": {
+    "publish to NPM": "npm publish"
+  },
+  "keywords": [
+    "slack"
+  ],
+  "author": {
+    "name": "Carter Medlin",
+    "email": "carter@digital.ca.gov",
+    "url": "https://github.com/carterm"
+  },
+  "dependencies": {
+    "fetch-retry": "^4.1.1",
+    "node-fetch": "^2.6.1"
+  }
+}
