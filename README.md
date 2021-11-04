@@ -1,3 +1,3 @@
 # Slack Connector
 
-Development project for [slack-connector](https://github.com/cagov/slack-connector/tree/main/slack-connector-module)
+Development project for [slack-connector](https://www.npmjs.com/package/@cagov/slack-connector)
