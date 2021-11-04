@@ -6,6 +6,7 @@
     "url": "https://github.com/cagov/slack-connector.git"
   },
   "description": "",
+  "readme": "slack-connector-module/README.md",
   "type": "commonjs",
   "scripts": {
     "install_normal": "npm install file:slack-connector-module",

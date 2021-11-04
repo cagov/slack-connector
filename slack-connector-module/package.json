@@ -8,6 +8,7 @@
   "type": "commonjs",
   "main": "index.js",
   "typings": "index.js",
+  "readme": "README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/cagov/slack-connector.git"
