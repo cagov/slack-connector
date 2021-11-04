@@ -69,3 +69,27 @@ let toplevel = slack.Clone();
 await slack.Reply("This is the first reply");
 await toplevel.ReactionAdd("thumbsup"); //Thumbs up on top level thread
 ```
+
+## Custom API options
+
+You can use any options supported by the API by adding them to the `options` argument. See the full list [here](https://api.slack.com/methods/chat.postMessage).
+
+```js
+await slack.Chat("This is the start of a thread", {
+  username: "My Custom Thread User",
+  icon_emoji: ":chart_with_upwards_trend:",
+  unfurl_media: false
+});
+```
+
+You can set the default options when you define the thread.
+
+```js
+let slack = new slack_connector(apiToken, channel, {
+  username: "My Custom Thread User",
+  icon_emoji: ":chart_with_upwards_trend:",
+  unfurl_media: false
+});
+await slack.Chat("Chat with the default options");
+await slack.Reply("Chat with the same default options");
+```
