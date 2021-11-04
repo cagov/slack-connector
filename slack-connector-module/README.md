@@ -4,8 +4,9 @@ A module for simplifying posting to Slack.
 
 ## Features
 
-- Built in retry for common connection issues using [fetch-retry](https://www.npmjs.com/package/fetch-retry)
-- Tracks threads to allow for easy replies
+- Built in retry for common connection issues using [fetch-retry](https://www.npmjs.com/package/fetch-retry).
+- Tracks threads to allow for easy replies.
+- Support for [chat.postMessage](https://api.slack.com/methods/chat.postMessage) and [reactions.add](https://api.slack.com/methods/reactions.add) method arguments.
 
 ## Set up
 
