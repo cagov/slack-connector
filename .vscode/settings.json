@@ -1,7 +1,4 @@
 {
-  "azureFunctions.deploySubpath": ".",
-  "azureFunctions.projectLanguage": "JavaScript",
-  "azureFunctions.projectRuntime": "~3",
   "debug.internalConsoleOptions": "neverOpen",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
