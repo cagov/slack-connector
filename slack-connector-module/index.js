@@ -81,8 +81,12 @@ class main {
   constructor(token, channel, defaultOptions) {
     /** @type {string} */
     this.channel = channel;
-    /** @type {string} */
-    this.token = token;
+    /**
+     * Hiding the token unless explicitly asked for
+     *
+     * @type {function():string}
+     */
+    this.__token = () => token;
     /** @type {slackChatOptions} */
     this.defaultOptions = defaultOptions;
 
@@ -90,138 +94,154 @@ class main {
     this.ts = "";
     /** @type {string} */
     this.thread_ts = "";
+  }
 
-    /**
-     * API Headers with token
-     */
-    this.slackApiHeaders = () => ({
+  /**
+   * API Headers with token
+   */
+  slackApiHeaders() {
+    return {
       Authorization: `Bearer ${this.token}`,
       "Content-Type": "application/json;charset=utf-8"
-    });
+    };
+  }
 
-    /**
-     * fetch settings for an API POST
-     * @param {*} bodyJSON JSON to POST
-     */
-    this.slackApiPost = bodyJSON => ({
+  /**
+   * fetch settings for an API POST
+   * @param {*} bodyJSON JSON to POST
+   */
+  slackApiPost(bodyJSON) {
+    return {
       method: "POST",
       headers: this.slackApiHeaders(),
       body: JSON.stringify(bodyJSON)
-    });
+    };
+  }
 
-    /**
-     * fetch settings for an API GET
-     */
-    this.slackApiGet = () => ({
+  /**
+   * fetch settings for an API GET
+   */
+  slackApiGet() {
+    return {
       headers: this.slackApiHeaders()
-    });
+    };
+  }
 
-    /**
-     * Add a Slack post
-     *
-     * (See https://api.slack.com/methods/chat.postMessage)
-     *
-     * (Also https://api.slack.com/docs/messages/builder)
-     * @param {string} text
-     * @param {slackChatOptions} [options] - Optional options
-     */
-    this.Chat = async (text, options) => {
+  /**
+   * Token saved for authentication use
+   */
+  get token() {
+    return this.__token();
+  }
+
+  /**
+   * Returns a clone of the original thread.  Usefull for referring to the thread start for reactions.
+   */
+  get Top() {
+    const clone = this.Clone();
+    clone.ts = clone.thread_ts;
+
+    return clone;
+  }
+
+  /**
+   * Add a Slack post
+   *
+   * (See https://api.slack.com/methods/chat.postMessage)
+   *
+   * (Also https://api.slack.com/docs/messages/builder)
+   * @param {string} text
+   * @param {slackChatOptions} [options] - Optional options
+   */
+  async Chat(text, options) {
+    const payload = {
+      channel: this.channel,
+      text,
+      ...this.defaultOptions,
+      ...options
+    };
+
+    const response = await fetch(slackApiChatPost, this.slackApiPost(payload));
+    /** @type {slackChatResult} */
+    const json = await getSlackJsonResponse(response);
+    this.thread_ts = json.ts;
+    this.ts = json.ts;
+    return json;
+  }
+
+  /**
+   * Add a reply to the last Slack post.
+   * @param {string} text
+   * @param {slackChatOptions} [options] - Optional options
+   */
+  async Reply(text, options) {
+    if (this.thread_ts) {
       const payload = {
         channel: this.channel,
         text,
-        ...defaultOptions,
+        thread_ts: this.thread_ts,
+        ...this.defaultOptions,
         ...options
       };
-
       const response = await fetch(
         slackApiChatPost,
         this.slackApiPost(payload)
       );
+
       /** @type {slackChatResult} */
       const json = await getSlackJsonResponse(response);
-      this.thread_ts = json.ts;
       this.ts = json.ts;
+      this.thread_ts = json.message.thread_ts;
       return json;
+    } else {
+      return await this.Chat(text, options);
+    }
+  }
+
+  /**
+   * Send error details to the channel
+   * @param {Error} e The Error object that was caught
+   * @param {*} [data] Any data that should be added to the exception log
+   * @param {slackChatOptions} [options] - Optional options
+   */
+  async Error(e, data, options) {
+    if (!this.thread_ts) {
+      await this.Chat(`Error - _${e.message}_`, options);
+    }
+
+    let message = `*Error Stack*\n\`\`\`${e.stack}\`\`\``;
+    if (data) {
+      message += `\n*Data*\n\`\`\`${JSON.stringify(data, null, 2)}\`\`\``;
+    }
+
+    return await this.Reply(message, options);
+  }
+  /**
+   * Add a reaction to the last Slack post.<br>
+   *
+   * (see https://api.slack.com/methods/reactions.add)
+   *
+   * @param {string} name - emoji name
+   */
+  async ReactionAdd(name) {
+    const payload = {
+      channel: this.channel,
+      timestamp: this.ts,
+      name
     };
+    const response = await fetch(slackApiReaction, this.slackApiPost(payload));
+    return await getSlackJsonResponse(response);
+  }
 
-    /**
-     * Add a reply to the last Slack post.
-     * @param {string} text
-     * @param {slackChatOptions} [options] - Optional options
-     */
-    this.Reply = async (text, options) => {
-      if (this.thread_ts) {
-        const payload = {
-          channel: this.channel,
-          text,
-          thread_ts: this.thread_ts,
-          ...defaultOptions,
-          ...options
-        };
-        const response = await fetch(
-          slackApiChatPost,
-          this.slackApiPost(payload)
-        );
+  /**
+   * Returns a clone.  Usefull for keeping track of an original timestamp
+   */
+  Clone() {
+    const copied = new main(this.token, this.channel, this.defaultOptions);
+    copied.thread_ts = this.thread_ts;
+    copied.ts = this.ts;
 
-        /** @type {slackChatResult} */
-        const json = await getSlackJsonResponse(response);
-        this.ts = json.ts;
-        this.thread_ts = json.message.thread_ts;
-        return json;
-      } else {
-        return await this.Chat(text, options);
-      }
-    };
-
-    /**
-     * Send error details to the channel
-     * @param {Error} e The Error object that was caught
-     * @param {*} [data] Any data that should be added to the exception log
-     * @param {slackChatOptions} [options] - Optional options
-     */
-    this.Error = async (e, data, options) => {
-      if (!this.thread_ts) {
-        await this.Chat(`Error - _${e.message}_`, options);
-      }
-
-      let message = `*Error Stack*\n\`\`\`${e.stack}\`\`\``;
-      if (data) {
-        message += `\n*Data*\n\`\`\`${JSON.stringify(data, null, 2)}\`\`\``;
-      }
-
-      return await this.Reply(message, options);
-    };
-
-    /**
-     * Add a reaction to the last Slack post.<br>
-     *
-     * (see https://api.slack.com/methods/reactions.add)
-     *
-     * @param {string} name - emoji name
-     */
-    this.ReactionAdd = async name => {
-      const payload = {
-        channel: this.channel,
-        timestamp: this.ts,
-        name
-      };
-      const response = await fetch(
-        slackApiReaction,
-        this.slackApiPost(payload)
-      );
-      return await getSlackJsonResponse(response);
-    };
-
-    /**
-     * Returns a clone.  Usefull for keeping track of an original timestamp
-     */
-    this.Clone = () => {
-      const copied = new main(this.token, this.channel, this.defaultOptions);
-      copied.thread_ts = this.thread_ts;
-      copied.ts = this.ts;
-
-      return copied;
-    };
+    return copied;
   }
 }
 
