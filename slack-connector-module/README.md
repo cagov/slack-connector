@@ -70,6 +70,17 @@ await slack.Reply("This is the first reply");
 await toplevel.ReactionAdd("thumbsup"); //Thumbs up on top level thread
 ```
 
+## The Top is always available
+
+You can always refer to the original thread with `Top`
+
+```js
+let slack = new slack_connector(apiToken, channel);
+await slack.Chat("Top Level Thread");
+await slack.Reply("This is the first reply");
+await slack.Top.ReactionAdd("thumbsup"); //Thumbs up on top level thread
+```
+
 ## Custom API options
 
 You can use any options supported by the API by adding them to the `options` argument. See the full list [here](https://api.slack.com/methods/chat.postMessage).
