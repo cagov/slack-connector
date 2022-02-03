@@ -29,6 +29,7 @@ module.exports = async function () {
 
   try {
     await A.Chat("A");
+    await A.ReactionAdd("gear");
 
     //throw new Error("Error Here");
 
@@ -45,6 +46,7 @@ module.exports = async function () {
     await A.ReactionAdd("thumbsup");
 
     await toplevel.ReactionAdd("x");
+    await A.Top.ReactionRemove("gear");
   } catch (e) {
     A.Error(e, { customdata: "goes here" });
     throw e;

@@ -1,12 +1,13 @@
 //@ts-check
-const fetch = require("fetch-retry")(require("node-fetch/lib"), {
+const fetch = require("fetch-retry")(require("node-fetch"), {
   retries: 3,
   retryDelay: 2000
 });
 const slackApiChatPost = "https://slack.com/api/chat.postMessage";
 const slackApiChannelHistory = "https://slack.com/api/conversations.history";
 const slackApiChannelReplies = "https://slack.com/api/conversations.replies";
-const slackApiReaction = "https://slack.com/api/reactions.add";
+const slackApiReactionAdd = "https://slack.com/api/reactions.add";
+const slackApiReactionRemove = "https://slack.com/api/reactions.remove";
 
 //For help building attachments...go here...
 //https://api.slack.com/docs/messages/builder
@@ -229,9 +230,27 @@ class main {
       timestamp: this.ts,
       name
     };
-    const response = await fetch(slackApiReaction, this.slackApiPost(payload));
+    const response = await fetch(slackApiReactionAdd, this.slackApiPost(payload));
     return await getSlackJsonResponse(response);
   }
+
+   /**
+   * Remove a reaction to the last Slack post.<br>
+   *
+   * (see https://api.slack.com/methods/reactions.remove)
+   *
+   * @param {string} name - emoji name
+   */
+     async ReactionRemove(name) {
+      const payload = {
+        channel: this.channel,
+        timestamp: this.ts,
+        name
+      };
+      const response = await fetch(slackApiReactionRemove, this.slackApiPost(payload));
+      return await getSlackJsonResponse(response);
+    }
+  
 
   /**
    * Returns a clone.  Usefull for keeping track of an original timestamp
