@@ -29,6 +29,7 @@ Use this for adding replies to a slack thread.
 await slack.Chat("This is the start of a thread");
 await slack.Reply("This is the first reply");
 await slack.ReactionAdd("thumbsup"); //Thumbs up on first reply
+await slack.ReactionRemove("thumbsup"); //Remove the reaction
 await slack.Reply("This is the second reply");
 ```
 
